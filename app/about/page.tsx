@@ -14,16 +14,16 @@ const YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v=HOJS3qQlVjE";
 const AboutUsPage = async () => {
   // const videoId = extractVideoId(YOUTUBE_VIDEO_URL);
 
-  const downloadedAudioFilePath = await getAudioFromYoutubeVideo(
-    YOUTUBE_VIDEO_URL
-  );
+  // const downloadedAudioFilePath = await getAudioFromYoutubeVideo(
+  //   YOUTUBE_VIDEO_URL
+  // );
 
-  console.log("downloaded Audio file path ", downloadedAudioFilePath);
-  const generatedAudioTranscription = await transcribeMP3WithWhisper(
-    downloadedAudioFilePath.outputPath!
-  );
+  // console.log("downloaded Audio file path ", downloadedAudioFilePath);
+  // const generatedAudioTranscription = transcribeMP3WithWhisper(
+  //   downloadedAudioFilePath.outputPath!
+  // );
 
-  console.log("generated Audio Transcription", generatedAudioTranscription);
+  // console.log("generated Audio Transcription", generatedAudioTranscription);
 
   // const fetchedTranscript = await getTranscript(
   //   "https://www.youtube.com/watch?v=HOJS3qQlVjE"
@@ -37,7 +37,7 @@ const AboutUsPage = async () => {
     <div className="max-w-md mx-auto pt-12">
       <h1>AboutUsPage</h1>
 
-      {JSON.stringify(generatedAudioTranscription)}
+      {/* {JSON.stringify(generatedAudioTranscription)} */}
 
       {/* <div>
         <h3>Downloaded Audio</h3>
