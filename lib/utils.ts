@@ -3,7 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { YoutubeTranscript } from "youtube-transcript";
 import ytdl from "@distube/ytdl-core";
-import { downloadAudio, downloadAudioAsMP3 } from "./youtube";
+import { downloadAudioAsMP3 } from "./youtube";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -31,22 +31,27 @@ export function extractVideoId(youtube_url: string): string {
 
 export const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789");
 
+/**
+ *
+ * @param youtube_url url of the youtube video
+ * @returns
+ */
 export const getAudioFromYoutubeVideo = async (youtube_url: string) => {
   try {
     const videoId = extractVideoId(youtube_url);
     console.log("extracted videoId", videoId);
-    const outputPath = await downloadAudioAsMP3(videoId);
-    console.log("output path is", outputPath);
+    const vercelBlobUrl = await downloadAudioAsMP3(videoId);
+    console.log("vercel blob url is", vercelBlobUrl);
 
     // const outputPath = await downloadAudio(videoId);
     return {
       type: "success",
-      outputPath,
+      vercelBlobUrl,
     };
   } catch (error) {
     return {
       type: "error",
-      message: "Could not get audio from video",
+      message: "Could not generate audio from video",
     };
   }
 };
@@ -71,6 +76,40 @@ export const getTranscript = async (youtube_url: string) => {
     }
 
     let slicedTranscript = fetchedTranscript.map((item) => item.text).join(" ");
+
+    return {
+      type: "success",
+      transcript: slicedTranscript,
+    };
+  } catch (error) {
+    console.log("error fetching transcript", error);
+    return {
+      type: "error",
+      transcript: "Could not find transcript",
+    };
+  }
+};
+
+export const getTranscriptFromVideoId = async (videoId: string) => {
+  try {
+    console.log("extracted videoId", videoId);
+    const fetchedTranscript = await YoutubeTranscript.fetchTranscript(videoId);
+
+    const firstFewLines = fetchedTranscript
+      .slice(0, 5)
+      .map((item) => item.text)
+      .join(" ");
+
+    let title = firstFewLines.split(".")[0].trim();
+    if (title.length > 100) {
+      title = title.substring(0, 97) + "...";
+    }
+    if (title.length < 10) {
+      title = `YouTube Video Summary`;
+    }
+
+    let slicedTranscript = fetchedTranscript.map((item) => item.text).join(" ");
+
     return {
       type: "success",
       title,
