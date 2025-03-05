@@ -8,6 +8,7 @@ import { embeddings } from "../db/schema/embeddings";
 const embeddingModel = openai.embedding("text-embedding-ada-002");
 
 const generateChunks = (input: string): string[] => {
+  console.log("input from generate chunks", input);
   return input
     .trim()
     .split(".")
@@ -38,10 +39,12 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
 
 export const findRelevantContent = async (userQuery: string) => {
   const userQueryEmbedded = await generateEmbedding(userQuery);
+
   const similarity = sql<number>`1 - (${cosineDistance(
     embeddings.embedding,
     userQueryEmbedded
   )})`;
+
   const similarGuides = await db
     .select({ name: embeddings.content, similarity })
     .from(embeddings)
