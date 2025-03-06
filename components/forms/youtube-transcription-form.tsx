@@ -17,7 +17,7 @@ export default function YouTubeTranscriptionForm() {
     // Use startTransition to mark the update as non-urgent.
     startTransition(async () => {
       try {
-        const response = await axios.post("/api/summarize", { url });
+        const response = await axios.post("/api/transcript", { url });
         console.log("response", response);
         if (response.data.type === "success") {
           setTranscript(response.data.transcript);
@@ -53,6 +53,14 @@ export default function YouTubeTranscriptionForm() {
 
   return (
     <div>
+      {transcript && (
+        <div className="mt-4 md:mt-6 lg:mt-8">
+          <h2>Transcript</h2>
+          <button className="bg-red-200">Save to Knowledge Base</button>
+          <pre style={{ whiteSpace: "pre-wrap" }}>{transcript}</pre>
+        </div>
+      )}
+
       <form
         onSubmit={handleSubmit}
         style={{ maxWidth: 600, margin: "2rem auto" }}
@@ -76,13 +84,6 @@ export default function YouTubeTranscriptionForm() {
           {isPending ? "Processing..." : "Get Transcript"}
         </button>
         {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
-        {transcript && (
-          <div style={{ marginTop: "1rem" }}>
-            <h2>Transcript</h2>
-            <button>Save to Knowledge Base</button>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{transcript}</pre>
-          </div>
-        )}
       </form>
     </div>
   );

@@ -1,6 +1,5 @@
-import generateContent from "@/lib/ai/generateContent";
+import { createResource } from "@/lib/actions/resources";
 import {
-  extractVideoId,
   getAudioFromYoutubeVideo,
   getTranscript,
   splitTranscriptIntoChunks,
@@ -9,42 +8,34 @@ import {
   createSummaryPrompt,
   transcribeBlobUrlWithWhisper,
 } from "@/lib/youtube";
-import { NextRequest, NextResponse } from "next/server";
+import { tool } from "ai";
+import { z } from "zod";
+import generateContent from "../generateContent";
 
-export async function POST(req: NextRequest) {
-  try {
+export const extractSummaryFromYoutubeUrl = tool({
+  description: `given a youtube url, extract summary of the entire youtube video. Given a youtube video url, use this tool to extract summary of the video`,
+  parameters: z.object({
+    youtubeUrl: z.string().describe("The youtube url to extract summary of"),
+  }),
+  execute: async ({ youtubeUrl }) => {
     console.log("inside playlist get request");
-    const { url } = await req.json();
 
-    if (!url || typeof url !== "string") {
-      return NextResponse.json(
-        {
-          message: "No Valid Url provided",
-        },
-        {
-          status: 400,
-        }
-      );
+    if (!youtubeUrl || typeof youtubeUrl !== "string") {
+      throw new Error("youtube url is not valid and is not available");
     }
 
-    console.log("found url", url);
+    console.log("found url inside extract summary youtube tool", youtubeUrl);
 
     let finalVideoTranscript;
 
-    const videoTranscript = await getTranscript(url);
+    const videoTranscript = await getTranscript(youtubeUrl);
 
     if (videoTranscript.type === "error") {
-      const { vercelBlobUrl } = await getAudioFromYoutubeVideo(url);
+      const { vercelBlobUrl } = await getAudioFromYoutubeVideo(youtubeUrl);
 
       if (!vercelBlobUrl) {
-        return NextResponse.json(
-          {
-            message: "Error Occured generated vercel blob url",
-            type: "error",
-          },
-          {
-            status: 400,
-          }
+        throw new Error(
+          "Audio generated file could not be generated and uploaded to vercel blob"
         );
       }
       const transcription = await transcribeBlobUrlWithWhisper(vercelBlobUrl);
@@ -55,10 +46,9 @@ export async function POST(req: NextRequest) {
 
     if (!finalVideoTranscript) {
       console.log("final video transcript was not generated");
-      return NextResponse.json({
-        errorMessage: "Final Video transcript was not generated",
-        type: "error",
-      });
+      throw new Error(
+        "final video transcript could not be generated and an error occured"
+      );
     }
 
     const chunks = await splitTranscriptIntoChunks(finalVideoTranscript);
@@ -94,17 +84,6 @@ export async function POST(req: NextRequest) {
       throw new Error("No summary content generated");
     }
 
-    return NextResponse.json({
-      summary,
-      type: "success",
-    });
-  } catch (error) {
-    console.error("an error occured while trying to generate summaries");
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    return NextResponse.json({
-      errorMessage,
-      type: "error",
-    });
-  }
-}
+    return summary;
+  },
+});

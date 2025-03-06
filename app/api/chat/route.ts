@@ -2,6 +2,8 @@ import { createResource } from "@/lib/actions/resources";
 import { findRelevantContent } from "@/lib/ai/embedding";
 import { openai } from "@/lib/ai/openai";
 import { addResource } from "@/lib/ai/tools/add-resource";
+import { extractDealInformationFromSummary } from "@/lib/ai/tools/extract-deal-information";
+import { extractSummaryFromYoutubeUrl } from "@/lib/ai/tools/extract-summary";
 import { streamText, tool } from "ai";
 import { z } from "zod";
 
@@ -14,12 +16,14 @@ export async function POST(req: Request) {
   console.log("messages", messages);
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openai("gpt-4o-2024-11-20"),
     system: `You are a helpful assistant. Check your knowledge base before answering any questions.
     Only respond to questions using information from tool calls.
     if no relevant information is found in the tool calls, respond, "Sorry, I don't know."`,
     messages,
     tools: {
+      extractSummaryFromYoutubeUrl,
+      extractDealInformationFromSummary,
       addResource,
       getInformation: tool({
         description: `get information from your knowledge base to answer questions.`,
