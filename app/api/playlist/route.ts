@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const { url } = await req.json();
 
   if (!url || typeof url !== "string") {
-    return NextResponse.json(
+    return Response.json(
       {
         message: "No Valid Url provided",
       },
@@ -40,8 +40,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     console.log("videos from playlist", videos);
 
-    return NextResponse.json(
-      { videos },
+    return Response.json(
+      {
+        videos,
+      },
       {
         status: 200,
       }
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log("an error occured trying to get playlist", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
-    return NextResponse.json(
+    return Response.json(
       {
         error,
         errorMessage,
