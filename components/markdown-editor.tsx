@@ -1466,13 +1466,6 @@ greet("World");
           >
             <ExternalLink size={16} />
           </button>
-          <button
-            className="p-1 rounded-md hover:bg-gray-100 text-gray-700 transition-colors duration-150"
-            title="Image"
-            onClick={() => applyFormatting("image")}
-          >
-            <Image size={16} />
-          </button>
         </div>
 
         <div className="flex space-x-1 mr-4">
