@@ -12,10 +12,6 @@ import ytpl from "ytpl";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   console.log("inside playlist get request");
-
-  //   const body = await req.json();
-  //   console.log("body", body);
-
   const { url } = await req.json();
 
   if (!url || typeof url !== "string") {
@@ -42,7 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       title: video.title,
     }));
 
-    console.log("videos from the playlist", videos);
+    console.log("videos from playlist", videos);
 
     return NextResponse.json(
       { videos },
