@@ -268,11 +268,19 @@ greet("World");
 `;
 
   // All state declarations
-  const [markdown, setMarkdown] = useState(function () {
-    // Try to load from localStorage
-    const saved = localStorage.getItem("markdown-content");
-    return saved ? saved : initialMarkdown;
-  });
+  const [markdown, setMarkdown] = useState<string>(initialMarkdown);
+
+  const ISSERVER = typeof window === "undefined";
+
+  useEffect(() => {
+    if (!ISSERVER) {
+      const markdownContent = localStorage.getItem("markdown-content");
+      if (markdownContent) {
+        setMarkdown(markdownContent);
+      }
+    }
+  }, []);
+
   const [renderedHtml, setRenderedHtml] = useState("");
   const [editorSize, setEditorSize] = useState(50);
   const [darkMode, setDarkMode] = useState(false);
