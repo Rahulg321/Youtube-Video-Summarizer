@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import ytpl from "ytpl";
 
 /**
@@ -10,7 +10,7 @@ import ytpl from "ytpl";
  * @returns
  */
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   console.log("inside playlist get request");
   const { url } = await req.json();
 
